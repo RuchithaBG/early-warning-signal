@@ -1,4 +1,4 @@
-# OG EWS
+# EWS.py
 
 import random as ran
 import statistics
