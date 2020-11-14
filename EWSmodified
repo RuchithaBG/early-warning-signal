@@ -1,9 +1,11 @@
-# Early Warning Signal with sex assignment at birth
+# EarlyWarningSignal with sex assignment at birth
 
 import numpy as np
 import random as ran
 import statistics
 import matplotlib.pyplot as plt
+import xlwt
+from xlwt import Workbook
 
 # Each generation
 def Egg2Fecund(num_eggs, larval_food, adult_nutrition, hatchability,
@@ -68,7 +70,6 @@ def timeseries(N_Eggs, LarFood, AdNut, NoG, hatchability, Mc, sex_ratio, x5, Sen
         LarFood, AdNut = food_decrease(LarFood, LarFoodminus, AdNut, AdNutminus)
     return [egg_tseries, tseries, ext, larvae_tseries, MeanLarvaeSize_tseries, MeanAdultSize_tseries, eggsperfemale_tseries]
 
-
 # Replicating timeseries
 def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init, LarFoodminus, AdNutminus):
     all_egg = []
@@ -109,7 +110,6 @@ def fluctuation_index(N_list):
 	FI=s1/s2
 	return FI
 
-
 LarFood=1.6
 LarFoodminus=0.001
 AdNut=1
@@ -121,7 +121,7 @@ x5=85
 SenDen=0.17
 SenSize=1.7
 NoG=100
-NoR=100
+NoR=100 #previously 10
 N_Eggs_init=30
 
 all_egg, all_adult, ext_count, all_larvae, all_larvae_size, all_adult_size, all_eggperfemale = replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init, LarFoodminus, AdNutminus)
@@ -158,8 +158,28 @@ for j in range(NoR):
     fig.add_subplot(326).plot(range(len(all_eggperfemale[j])), all_eggperfemale[j])
 plt.title("eggs per female")
 
+plt.tight_layout()
+plt.savefig("PopulationSizeValues.pdf", dpi=300)
 plt.show()
 plt.close()
+
+# writing PopulationSizeValues to xl
+wb1 = Workbook()
+sheet1 = wb1.add_sheet('Fecundity')
+sheet2 = wb1.add_sheet('LarvaeNumber')
+sheet3 = wb1.add_sheet('AdultNumber')
+sheet4 = wb1.add_sheet('LarvaeSize')
+sheet5 = wb1.add_sheet('AdultSize')
+sheet6 = wb1.add_sheet('FecundityPerFemale')
+for i in range(NoR):
+    for j in range(NoG):
+        sheet1.write(i, j, all_egg[i][j])
+        sheet2.write(i, j, all_larvae[i][j])
+        sheet3.write(i, j, all_adult[i][j])
+        sheet4.write(i, j, all_larvae_size[i][j])
+        sheet5.write(i, j, all_adult_size[i][j])
+        sheet6.write(i, j, all_eggperfemale[i][j])
+wb1.save('PopulationSizeValues.xls')
 
 g=15
 
@@ -180,15 +200,18 @@ def Indices(g, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize,
     fecundityperfemale_index = []
     all_adult = np.array(all_adult)
     for j in range(NoR):
-        for i in range(g+1, len(all_adult[j])):
+        for i in range(len(all_adult[j])):
             if all_adult[j][i] == 0:
-                fec_index = [(all_egg[j][k] -statistics.mean(all_egg[j][:k])) /np.std(all_egg[j][:k]) for k in range(i-g, i)]
-                num_larvae_index = [(all_larvae[j][k] -statistics.mean(all_larvae[j][:k])) /np.std(all_larvae[j][:k]) for k in range(i-g, i)]
-                num_adult_index = [(all_adult[j][k] -statistics.mean(all_adult[j][:k])) /np.std(all_adult[j][:k]) for k in range(i-g, i)]
-                larvae_size_index = [(all_larvae_size[j][k] -statistics.mean(all_larvae_size[j][:k])) /np.std(all_larvae_size[j][:k]) for k in range(i-g, i)]
-                adult_size_index = [(all_adult_size[j][k] -statistics.mean(all_adult_size[j][:k])) /np.std(all_adult_size[j][:k]) for k in range(i-g, i)]
-                fecundityperfemale_index = [(all_eggperfemale[j][k] -statistics.mean(all_eggperfemale[j][:k])) /np.std(all_eggperfemale[j][:k]) for k in range(i-g, i)]
-                break
+                if i<=15:  # To exclude replicates which die in first 15 generations
+                    break
+                else:
+                    fec_index = [(all_egg[j][k] -statistics.mean(all_egg[j][:k])) /np.std(all_egg[j][:k]) for k in range(i-g, i)]
+                    num_larvae_index = [(all_larvae[j][k] -statistics.mean(all_larvae[j][:k])) /np.std(all_larvae[j][:k]) for k in range(i-g, i)]
+                    num_adult_index = [(all_adult[j][k] -statistics.mean(all_adult[j][:k])) /np.std(all_adult[j][:k]) for k in range(i-g, i)]
+                    larvae_size_index = [(all_larvae_size[j][k] -statistics.mean(all_larvae_size[j][:k])) /np.std(all_larvae_size[j][:k]) for k in range(i-g, i)]
+                    adult_size_index = [(all_adult_size[j][k] -statistics.mean(all_adult_size[j][:k])) /np.std(all_adult_size[j][:k]) for k in range(i-g, i)]
+                    fecundityperfemale_index = [(all_eggperfemale[j][k] -statistics.mean(all_eggperfemale[j][:k])) /np.std(all_eggperfemale[j][:k]) for k in range(i-g, i)]
+                    break
         FecundityIndex += [fec_index]
         LarvaeNumberIndex += [num_larvae_index]
         AdultNumberIndex += [num_adult_index]
@@ -199,38 +222,128 @@ def Indices(g, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize,
 
 FecundityIndex, LarvaeNumberIndex, AdultNumberIndex, LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex = Indices(g, LarFood, AdNut, hatchability, Mc, sex_ratio, x5, SenDen, SenSize, NoG, NoR, N_Eggs_init, LarFoodminus, AdNutminus)
 
+# For boxplot
+FecundityIndexbox = []
+LarvaeNumberIndexbox = []
+AdultNumberIndexbox = []
+LarvaeSizeIndexbox = []
+AdultSizeIndexbox = []
+FecundityPerFemaleIndexbox = []
+
+for j in range(g):
+    FecundityIndexB = []
+    LarvaeNumberIndexB = []
+    AdultNumberIndexB = []
+    LarvaeSizeIndexB = []
+    AdultSizeIndexB = []
+    FecundityPerFemaleIndexB = []
+    for i in range(NoR):
+        if FecundityIndex[i] != []:
+            FecundityIndexB.append(FecundityIndex[i][j])
+        if LarvaeNumberIndex[i] != []:
+            LarvaeNumberIndexB.append(LarvaeNumberIndex[i][j])
+        if AdultNumberIndex[i] != []:
+            AdultNumberIndexB.append(AdultNumberIndex[i][j])
+        if LarvaeSizeIndex[i] != []:
+            LarvaeSizeIndexB.append(LarvaeSizeIndex[i][j])
+        if AdultSizeIndex[i] != []:
+            AdultSizeIndexB.append(AdultSizeIndex[i][j])
+        if FecundityPerFemaleIndex[i] != []:
+            FecundityPerFemaleIndexB.append(FecundityPerFemaleIndex[i][j])
+    FecundityIndexbox += [FecundityIndexB]
+    LarvaeNumberIndexbox += [LarvaeNumberIndexB]
+    AdultNumberIndexbox += [AdultNumberIndexB]
+    LarvaeSizeIndexbox += [LarvaeSizeIndexB]
+    AdultSizeIndexbox += [AdultSizeIndexB]
+    FecundityPerFemaleIndexbox += [FecundityPerFemaleIndexB]
+
+# writing Indices to xl
+wb = Workbook()
+sheet1 = wb.add_sheet('FecundityIndex')
+sheet2 = wb.add_sheet('LarvaeNumberIndex')
+sheet3 = wb.add_sheet('AdultNumberIndex')
+sheet4 = wb.add_sheet('LarvaeSizeIndexbox')
+sheet5 = wb.add_sheet('AdultSizeIndex')
+sheet6 = wb.add_sheet('FecundityPerFemaleIndex')
+for i in range(g):
+    for j in range(len(FecundityIndexbox[0])):
+        sheet1.write(j, i, FecundityIndexbox[i][j])
+        sheet2.write(j, i, LarvaeNumberIndexbox[i][j])
+        sheet3.write(j, i, AdultNumberIndexbox[i][j])
+        sheet4.write(i, j, LarvaeSizeIndexbox[i][j])
+        sheet5.write(j, i, AdultSizeIndexbox[i][j])
+        sheet6.write(j, i, FecundityPerFemaleIndexbox[i][j])
+wb.save('Indices.xls')
+
+# fig = plt.figure()  # For scatterplot of indices
+#
+# # Plot FecundityIndex against time
+# for j in range(NoR):
+#     fig.add_subplot(321).plot(range(len(FecundityIndex[j])), FecundityIndex[j])
+# plt.title("FecundityIndex_modified")
+#
+# # Plot LarvaeNumberIndex against time
+# for j in range(NoR):
+#     fig.add_subplot(323).plot(range(len(LarvaeNumberIndex[j])), LarvaeNumberIndex[j])
+# plt.title("LarvaeNumberIndex")
+#
+# # Plot AdultNumberIndex against time
+# for j in range(NoR):
+#     fig.add_subplot(325).plot(range(len(AdultNumberIndex[j])), AdultNumberIndex[j])
+# plt.title("AdultNumberIndex")
+#
+# # Plot LarvaeSizeIndex against time
+# for j in range(NoR):
+#     fig.add_subplot(322).plot(range(len(LarvaeSizeIndex[j])), LarvaeSizeIndex[j])
+# plt.title("LarvaeSizeIndex")
+#
+# # Plot AdultSizeIndex against time
+# for j in range(NoR):
+#     fig.add_subplot(324).plot(range(len(AdultSizeIndex[j])), AdultSizeIndex[j])
+# plt.title("AdultSizeIndex")
+#
+# # Plot all_eggperfemale against time_axis
+# for j in range(NoR):
+#     fig.add_subplot(326).plot(range(len(FecundityPerFemaleIndex[j])), FecundityPerFemaleIndex[j])
+# plt.title("FecundityPerFemaleIndex")
+#
+# plt.show()
+# plt.close()
+
 fig = plt.figure()
 
 # Plot FecundityIndex against time
 for j in range(NoR):
-    fig.add_subplot(321).plot(range(len(FecundityIndex[j])), FecundityIndex[j])
-plt.title("FecundityIndex_modified")
+    fig.add_subplot(321).boxplot(FecundityIndexbox)
+plt.title("FecundityIndex")
 
 # Plot LarvaeNumberIndex against time
 for j in range(NoR):
-    fig.add_subplot(323).plot(range(len(LarvaeNumberIndex[j])), LarvaeNumberIndex[j])
+    fig.add_subplot(323).boxplot(LarvaeNumberIndexbox)
 plt.title("LarvaeNumberIndex")
 
 # Plot AdultNumberIndex against time
 for j in range(NoR):
-    fig.add_subplot(325).plot(range(len(AdultNumberIndex[j])), AdultNumberIndex[j])
+    fig.add_subplot(325).boxplot(AdultNumberIndexbox)
 plt.title("AdultNumberIndex")
 
 # Plot LarvaeSizeIndex against time
 for j in range(NoR):
-    fig.add_subplot(322).plot(range(len(LarvaeSizeIndex[j])), LarvaeSizeIndex[j])
+    fig.add_subplot(322).boxplot(LarvaeSizeIndexbox)
 plt.title("LarvaeSizeIndex")
 
 # Plot AdultSizeIndex against time
 for j in range(NoR):
-    fig.add_subplot(324).plot(range(len(AdultSizeIndex[j])), AdultSizeIndex[j])
+    fig.add_subplot(324).boxplot(AdultSizeIndexbox)
 plt.title("AdultSizeIndex")
 
 # Plot all_eggperfemale against time_axis
 for j in range(NoR):
-    fig.add_subplot(326).plot(range(len(FecundityPerFemaleIndex[j])), FecundityPerFemaleIndex[j])
+    fig.add_subplot(326).boxplot(FecundityPerFemaleIndexbox)
 plt.title("FecundityPerFemaleIndex")
 
+plt.tight_layout()
+plt.savefig("Indices.pdf", dpi=300)
 plt.show()
 plt.close()
 
