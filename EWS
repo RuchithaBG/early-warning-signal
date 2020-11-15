@@ -1,4 +1,4 @@
-# EWS
+# EWS.py
 
 import random as ran
 import statistics
@@ -221,8 +221,6 @@ def Indices(g, LarFood, all_egg, all_adult, ext_count, all_larvae, all_larvae_si
     return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex, LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
 
 FecundityIndex, LarvaeNumberIndex, AdultNumberIndex, LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex = Indices(g, LarFood, all_egg, all_adult, ext_count, all_larvae, all_larvae_size, all_adult_size, all_eggperfemale)
-
-print(FecundityIndex)
 
 # For boxplot
 FecundityIndexbox = []
