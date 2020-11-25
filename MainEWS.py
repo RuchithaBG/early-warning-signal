@@ -21,14 +21,18 @@ Mc=1.1  # Critical mass --> minimum mass for larvae to become an adult
 sex_ratio=0.5  # male:female
 SenDen=0.17
 SenSize=1.7
-NoG=100
+NoG=100  #previously 100
 NoR=10 #previously 10
 N_Eggs_init=30
+
+import random as ran
+import numpy as np
+import statistics
 
 # Function to generate flies per generation
 def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen,
                SenSize):
-    # Some proportionality constants for fitting:
+    # Some scaling "constants":
     x1 = 4.2
     x2 = 1
     x3 = 0.009
@@ -41,8 +45,7 @@ def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen,
     SD = 0.31  # Standard deviation for larvae size
     fecundity = []
     if N_larvae != 0:
-        MeanLarvaeSize = x1 *(1 -(1.0 /(x2 +np.exp(-x3 *N_larvae
-                         /LarFood))))
+        MeanLarvaeSize = x1 *(1 -(1.0 /(x2 +np.exp(-x3 *N_larvae /LarFood))))
     else:
         MeanLarvaeSize = 0
     larvae_size = np.random.normal(MeanLarvaeSize, SD, N_larvae)
@@ -59,6 +62,6 @@ def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen,
     for k in range(N_Adult):
         if ran.random() < sex_ratio:
             fecundity[k] = -1
-    NMales = len([x for x in fecundity if x == -1])
+    NMales = np.count_nonzero(fecundity == -1)
     fecundity = list(fecundity)
     return (fecundity, N_larvae, MeanLarvaeSize, MeanAdultSize)
