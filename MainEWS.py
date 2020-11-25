@@ -88,7 +88,7 @@ def timeseries(N_Eggs, LarFood, AdNut, NoG, hatchability, Mc, sex_ratio,
                                                         hatchability, Mc,
                                                         sex_ratio, SenDen,
                                                         SenSize)
-        N_females = np.count_nonzero(fecundity != -1)
+        N_females = np.count_nonzero(fecj != -1)
         adult_tseries += [len(fecj)]
         larvae_tseries += [N_larvae]
         MeanLarvaeSize_tseries += [MeanLarvaeSize]
@@ -328,3 +328,64 @@ def meanIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
         FecundityPerFemaleIndex += [fecundityperfemale_index]
     return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex,
            LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
+
+# g=5
+# all_egg = [[1,2,1,2,1,2,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+# all_adult = [[1,1,1,1,1,1,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+# all_larvae = [[1,1,1,1,1,1,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+# all_larvae_size = [[1,1,1,1,1,1,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+# all_adult_size = [[1,1,1,1,1,1,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+# all_eggperfemale = [[1,1,1,1,1,1,1,0,0,0],[1,1,1,1,0,0,0,0,0,0],[1,1,1,1,1,1,1,1,1,1]]
+FecundityIndex, LarvaeNumberIndex, AdultNumberIndex, LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex = stddevIndex(g, all_egg, all_adult, all_larvae, all_larvae_size, all_adult_size, all_eggperfemale)
+
+FecundityIndexbox = []
+LarvaeNumberIndexbox = []
+AdultNumberIndexbox = []
+LarvaeSizeIndexbox = []
+AdultSizeIndexbox = []
+FecundityPerFemaleIndexbox = []
+for j in range(g):
+    FecundityIndexB = []
+    LarvaeNumberIndexB = []
+    AdultNumberIndexB = []
+    LarvaeSizeIndexB = []
+    AdultSizeIndexB = []
+    FecundityPerFemaleIndexB = []
+    for i in range(len(FecundityIndex)):
+        if FecundityIndex[i] != []:
+            FecundityIndexB.append(FecundityIndex[i][j])
+        if LarvaeNumberIndex[i] != []:
+            LarvaeNumberIndexB.append(LarvaeNumberIndex[i][j])
+        if AdultNumberIndex[i] != []:
+            AdultNumberIndexB.append(AdultNumberIndex[i][j])
+        if LarvaeSizeIndex[i] != []:
+            LarvaeSizeIndexB.append(LarvaeSizeIndex[i][j])
+        if AdultSizeIndex[i] != []:
+            AdultSizeIndexB.append(AdultSizeIndex[i][j])
+        if FecundityPerFemaleIndex[i] != []:
+            FecundityPerFemaleIndexB.append(FecundityPerFemaleIndex[i][j])
+    FecundityIndexbox += [FecundityIndexB]
+    LarvaeNumberIndexbox += [LarvaeNumberIndexB]
+    AdultNumberIndexbox += [AdultNumberIndexB]
+    LarvaeSizeIndexbox += [LarvaeSizeIndexB]
+    AdultSizeIndexbox += [AdultSizeIndexB]
+    FecundityPerFemaleIndexbox += [FecundityPerFemaleIndexB]
+
+plt.boxplot(FecundityIndexbox)
+plt.savefig("stdFecundityIndexbox.pdf",dpi=300)
+plt.close()
+plt.boxplot(LarvaeNumberIndexbox)
+plt.savefig("stdLarvaeNumberIndexbox.pdf",dpi=300)
+plt.close()
+plt.boxplot(AdultNumberIndexbox)
+plt.savefig("stdAdultNumberIndexbox.pdf",dpi=300)
+plt.close()
+plt.boxplot(LarvaeSizeIndexbox)
+plt.savefig("stdLarvaeSizeIndexbox.pdf",dpi=300)
+plt.close()
+plt.boxplot(AdultSizeIndexbox)
+plt.savefig("stdAdultSizeIndexbox.pdf",dpi=300)
+plt.close()
+plt.boxplot(FecundityPerFemaleIndexbox)
+plt.savefig("stdFecundityPerFemaleIndexbox.pdf",dpi=300)
+plt.close()
