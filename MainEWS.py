@@ -200,7 +200,7 @@ def stddevIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
     return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex,
            LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
 
-# Calculating index 1: stddev
+# Calculating index 2: var
 def varIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
                 all_adult_size, all_eggperfemale):
     FecundityIndex = []
@@ -243,7 +243,7 @@ def varIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
     return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex,
            LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
 
-# Calculating index 1: stddev
+# Calculating index 3: xi - avg
 def i_minus_avg_Index(g, all_egg, all_adult, all_larvae, all_larvae_size,
                 all_adult_size, all_eggperfemale):
     FecundityIndex = []
@@ -275,6 +275,49 @@ def i_minus_avg_Index(g, all_egg, all_adult, all_larvae, all_larvae_size,
                     adult_size_index = [(all_adult_size[j][k] -np.mean(all_adult_size[j][:k]))
                                         for k in range(i-g, i)]
                     fecundityperfemale_index = [(all_eggperfemale[j][k] -np.mean(all_eggperfemale[j][:k]))
+                                                for k in range(i-g, i)]
+                    break
+        FecundityIndex += [fec_index]
+        LarvaeNumberIndex += [num_larvae_index]
+        AdultNumberIndex += [num_adult_index]
+        LarvaeSizeIndex += [larvae_size_index]
+        AdultSizeIndex += [adult_size_index]
+        FecundityPerFemaleIndex += [fecundityperfemale_index]
+    return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex,
+           LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
+
+# Calculating index 4: mean
+def meanIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
+                all_adult_size, all_eggperfemale):
+    FecundityIndex = []
+    LarvaeNumberIndex = []
+    AdultNumberIndex = []
+    LarvaeSizeIndex = []
+    AdultSizeIndex = []
+    FecundityPerFemaleIndex = []
+    for j in range(len(all_adult)):  # len(all_adult) --> NoR
+        fec_index = []
+        num_larvae_index = []
+        num_adult_index = []
+        larvae_size_index = []
+        adult_size_index = []
+        fecundityperfemale_index = []
+        for i in range(len(all_adult[j])):
+            if all_adult[j][i] == 0:
+                if i<g:  # To exclude replicates which die in <'g' generations
+                    break
+                else:
+                    fec_index = [np.mean(all_egg[j][:k])
+                                 for k in range(i-g, i)]
+                    num_larvae_index = [np.mean(all_larvae[j][:k])
+                                        for k in range(i-g, i)]
+                    num_adult_index = [np.mean(all_adult[j][:k])
+                                       for k in range(i-g, i)]
+                    larvae_size_index = [np.mean(all_larvae_size[j][:k])
+                                         for k in range(i-g, i)]
+                    adult_size_index = [np.mean(all_adult_size[j][:k])
+                                        for k in range(i-g, i)]
+                    fecundityperfemale_index = [np.mean(all_eggperfemale[j][:k])
                                                 for k in range(i-g, i)]
                     break
         FecundityIndex += [fec_index]
