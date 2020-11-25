@@ -144,3 +144,11 @@ def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen, SenSize,
 all_egg, all_adult, all_larvae, all_larvae_size, all_adult_size, all_eggperfemale, ext_count = replicates(LarFood, AdNut, hatchability,
                                                                                                Mc, sex_ratio, SenDen, SenSize, NoG, NoR,
                                                                                                N_Eggs_init, LarFoodminus, AdNutminus)
+
+# Calculating fluctuation_index
+def fluctuation_index(N_list):
+	s=0
+	for i in range(1,len(N_list)):
+		s=s+abs(float(N_list[i])-float(N_list[i-1]))
+	FI=s/(len(N_list)-1)
+	return FI
