@@ -140,3 +140,7 @@ def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen, SenSize,
         ext_count += ext
     return (all_egg, all_adult, all_larvae, all_larvae_size, all_adult_size,
             all_eggperfemale, ext_count)
+
+all_egg, all_adult, all_larvae, all_larvae_size, all_adult_size, all_eggperfemale, ext_count = replicates(LarFood, AdNut, hatchability,
+                                                                                               Mc, sex_ratio, SenDen, SenSize, NoG, NoR,
+                                                                                               N_Eggs_init, LarFoodminus, AdNutminus)
