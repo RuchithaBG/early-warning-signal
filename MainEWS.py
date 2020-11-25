@@ -7,10 +7,12 @@
 # reduction in larvae food --> degrading environment
 
 # Notes to self:
-# 1. Remember that you are no longer passing x5 as an arguement for Egg2Fecund
-#    and timeseries fuctions.
+# 1. Remember that you are no longer passing x5 as an arguement for Egg2Fecund,
+#    timeseries and replicates fuctions.
 # 2. Remember that you changed position of ext variable in return statement of
 #    timeseries function.
+# 3. Remember that you changed position of ext_count variable in return
+#    statement of replicates function.
 
 # Properties of the system:
 LarFood=1.6
@@ -109,3 +111,32 @@ def food_decrease(LarFood, LarFoodminus, AdNut, AdNutminus):
     if AdNut>AdNutminus:
         AdNut = AdNut -AdNutminus
     return (LarFood, AdNut)
+
+# Replicating timeseries
+def replicates(LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen, SenSize,
+               NoG, NoR, N_Eggs_init, LarFoodminus, AdNutminus):
+    all_egg = []
+    all_adult = []
+    all_larvae = []
+    all_larvae_size = []
+    all_adult_size = []
+    all_eggperfemale = []
+    N_Eggs = N_Eggs_init
+    ext_count=0
+    for rep in range(NoR):
+        [N_egg, N_adult, N_larvae,
+        MeanLarvaeSize_tseries,
+        MeanAdultSize_tseries,
+        eggsperfemale_tseries, ext]= timeseries(N_Eggs, LarFood, AdNut,
+                                                NoG, hatchability, Mc,
+                                                sex_ratio, SenDen, SenSize,
+                                                LarFoodminus, AdNutminus)
+        all_egg += [N_egg]
+        all_adult += [N_adult]
+        all_larvae += [N_larvae]
+        all_larvae_size += [MeanLarvaeSize_tseries]
+        all_adult_size += [MeanAdultSize_tseries]
+        all_eggperfemale += [eggsperfemale_tseries]
+        ext_count += ext
+    return (all_egg, all_adult, all_larvae, all_larvae_size, all_adult_size,
+            all_eggperfemale, ext_count)
