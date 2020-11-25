@@ -8,8 +8,9 @@
 
 # Notes to self:
 # 1. Remember that you are no longer passing x5 as an arguement for Egg2Fecund
-#    fuction.
-# 2.
+#    and timeseries fuctions.
+# 2. Remember that you changed position of ext variable in return statement of
+#    timeseries function.
 
 # Properties of the system:
 LarFood=1.6
@@ -62,6 +63,49 @@ def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen,
     for k in range(N_Adult):
         if ran.random() < sex_ratio:
             fecundity[k] = -1
-    NMales = np.count_nonzero(fecundity == -1)
+    N_males = np.count_nonzero(fecundity == -1)
     fecundity = list(fecundity)
     return (fecundity, N_larvae, MeanLarvaeSize, MeanAdultSize)
+
+# Generating timeseries
+def timeseries(N_Eggs, LarFood, AdNut, NoG, hatchability, Mc, sex_ratio,
+               SenDen, SenSize, LarFoodminus, AdNutminus):
+    adult_tseries = []
+    egg_tseries = []
+    eggsperfemale_tseries = []
+    larvae_tseries = []
+    MeanLarvaeSize_tseries = []
+    MeanAdultSize_tseries = []
+    ext=0  # variable to count number of extinctions
+    for t in range(NoG):
+        egg_tseries += [N_Eggs]
+        fecj, N_larvae, MeanLarvaeSize, MeanAdultSize = Egg2Fecund(N_Eggs,
+                                                        LarFood, AdNut,
+                                                        hatchability, Mc,
+                                                        sex_ratio, SenDen,
+                                                        SenSize)
+        N_females = np.count_nonzero(fecundity != -1)
+        adult_tseries += [len(fecj)]
+        larvae_tseries += [N_larvae]
+        MeanLarvaeSize_tseries += [MeanLarvaeSize]
+        MeanAdultSize_tseries += [MeanAdultSize]
+        N_Eggs = sum([int(round(x)) for x in fecj if x != -1])
+        if N_females !=0:
+            eggsperfemale_tseries += [N_Eggs/N_females]
+        else:
+            eggsperfemale_tseries += [0]
+        if len(fecj) == 0 & ext == 0:
+            ext = 1
+        LarFood, AdNut = food_decrease(LarFood, LarFoodminus, AdNut,
+                         AdNutminus)
+    return [egg_tseries, adult_tseries, larvae_tseries,
+            MeanLarvaeSize_tseries, MeanAdultSize_tseries,
+            eggsperfemale_tseries, ext]
+
+# Decreasing Larval and Adult food
+def food_decrease(LarFood, LarFoodminus, AdNut, AdNutminus):
+    if LarFood>LarFoodminus:
+        LarFood = LarFood -LarFoodminus
+    if AdNut>AdNutminus:
+        AdNut = AdNut -AdNutminus
+    return (LarFood, AdNut)
