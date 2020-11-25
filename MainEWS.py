@@ -25,12 +25,14 @@ sex_ratio=0.5  # male:female
 SenDen=0.17
 SenSize=1.7
 NoG=100  #previously 100
-NoR=10 #previously 10
+NoR=100 #previously 10
 N_Eggs_init=30
+g=15  # Number of generations before extinction for which index is calculated
 
 import random as ran
 import numpy as np
 import statistics
+import matplotlib.pyplot as plt
 
 # Function to generate flies per generation
 def Egg2Fecund(N_Eggs, LarFood, AdNut, hatchability, Mc, sex_ratio, SenDen,
@@ -152,3 +154,48 @@ def fluctuation_index(N_list):
 		s=s+abs(float(N_list[i])-float(N_list[i-1]))
 	FI=s/(len(N_list)-1)
 	return FI
+
+# A bunch of functions to compute simple indices
+
+# Calculating index 1: stddev
+def stddevIndex(g, all_egg, all_adult, all_larvae, all_larvae_size,
+                all_adult_size, all_eggperfemale):
+    FecundityIndex = []
+    LarvaeNumberIndex = []
+    AdultNumberIndex = []
+    LarvaeSizeIndex = []
+    AdultSizeIndex = []
+    FecundityPerFemaleIndex = []
+    for j in range(len(all_adult)):  # len(all_adult) --> NoR
+        fec_index = []
+        num_larvae_index = []
+        num_adult_index = []
+        larvae_size_index = []
+        adult_size_index = []
+        fecundityperfemale_index = []
+        for i in range(len(all_adult[j])):
+            if all_adult[j][i] == 0:
+                if i<g:  # To exclude replicates which die in <'g' generations
+                    break
+                else:
+                    fec_index = [np.std(all_egg[j][:k])
+                                 for k in range(i-g, i)]
+                    num_larvae_index = [np.std(all_larvae[j][:k])
+                                        for k in range(i-g, i)]
+                    num_adult_index = [np.std(all_adult[j][:k])
+                                       for k in range(i-g, i)]
+                    larvae_size_index = [np.std(all_larvae_size[j][:k])
+                                         for k in range(i-g, i)]
+                    adult_size_index = [np.std(all_adult_size[j][:k])
+                                        for k in range(i-g, i)]
+                    fecundityperfemale_index = [np.std(all_eggperfemale[j][:k])
+                                                for k in range(i-g, i)]
+                    break
+        FecundityIndex += [fec_index]
+        LarvaeNumberIndex += [num_larvae_index]
+        AdultNumberIndex += [num_adult_index]
+        LarvaeSizeIndex += [larvae_size_index]
+        AdultSizeIndex += [adult_size_index]
+        FecundityPerFemaleIndex += [fecundityperfemale_index]
+    return(FecundityIndex, LarvaeNumberIndex, AdultNumberIndex,
+           LarvaeSizeIndex, AdultSizeIndex, FecundityPerFemaleIndex)
